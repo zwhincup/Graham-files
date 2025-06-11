@@ -1,0 +1,20 @@
+#!/bin/bash
+#SBATCH -A rrg-pmyers-ad_cpu
+#SBATCH --time=00:01:00
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=18
+#SBATCH --mem=4600
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=zwhincup@ualberta.ca
+
+module load intel/2018.2 gsl/2.4
+module load gnu-parallel
+
+parallel -j $SLURM_TASKS_PER_NODE --joblog LOGFILE-LabERA5-Stitch2 '/project/6007519/zwhincup/TempestEnv/tempestextremes-master/bin/StitchNodes --in "/project/6007519/zwhincup/TempestOutput/ERA5/DetectNodesOutput/{}_Lab_Candidates" --out "/project/6007519/zwhincup/TempestOutput/ERA5/StitchNodesOutput/nohead/{}_ERA5_Lab_CandidatesNH.txt" --range 6.0 --mintime "48h" --maxgap 18h --min_endpoint_dist 6.0 --out_file_format "csvnohead"' ::: {2002..2019} 
+
+#--threshold lat,>,49.4;lon,>,290.5;lat,<,69;lon,<,324"
+
+# range: maximum distance btwn candidates on a path, 6 great-circle degrees
+# mintime: min duration of feature, 48 hours
+# maxgap: max number of allowed missing points between nearby candidates to still consider them as the same path, 18h
+# min_endpoint_dist: minimum distance btwn first and last points on a path (to exclude stationary features), 6 great-circle degrees

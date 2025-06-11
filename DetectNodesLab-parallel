@@ -1,0 +1,15 @@
+#!/bin/bash
+#SBATCH -A rrg-pmyers-ad_cpu
+#SBATCH --time=00:12:00
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=18
+#SBATCH --mem=4600
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=zwhincup@ualberta.ca
+
+module load intel/2018.2 gsl/2.4
+module load gnu-parallel
+
+parallel -j $SLURM_TASKS_PER_NODE --joblog LOGFILE-LabERA5 '/project/6007519/zwhincup/TempestEnv/tempestextremes-master/bin/DetectNodes --in_data "/project/6007519/ANHA4-I/ATMFORCING/ERA5/Ready/NEMO_ERA5_mslp_y{}.nc" --out "/project/6007519/zwhincup/TempestOutput/ERA5/DetectNodesOutput/{}_Lab_Candidates" --searchbymin msl --closedcontourcmd "msl,200.0,6.0,0" --mergedist 6.0 --outputcmd "msl,min,0" --latname "latitude" --lonname "longitude" --minlat 49.4 --maxlat 68.8 --minlon 290.5 --maxlon 324.0 --timefilter "....-..-.. (00|03|06|09|12|15|18|21):00:00" --out_header' ::: {2002..2019}
+
+
